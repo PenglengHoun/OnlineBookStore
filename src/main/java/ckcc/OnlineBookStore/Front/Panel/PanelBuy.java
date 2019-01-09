@@ -18,10 +18,16 @@ import javax.swing.JButton;
 import javax.swing.JRadioButton;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import java.awt.Color;
 
-public class PanelMyShoppingCart extends JPanel {
+public class PanelBuy extends JPanel {
 	
 	private JPanel pnlMain;
 	
@@ -39,12 +45,13 @@ public class PanelMyShoppingCart extends JPanel {
 	
 	private JButton btnDelete;
 	private JButton btnUpdateAmount;
-	private JButton btnCheckout;
+	private JButton btnCheckOut;
 
-	public PanelMyShoppingCart() {
+	public PanelBuy() {
 		setLayout(new BorderLayout(0, 0));
 		
 		JLabel lblMyShoppingCart = new JLabel("My Shopping Cart");
+		lblMyShoppingCart.setForeground(new Color(255, 0, 255));
 		lblMyShoppingCart.setHorizontalAlignment(SwingConstants.CENTER);
 		lblMyShoppingCart.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		add(lblMyShoppingCart, BorderLayout.NORTH);
@@ -60,9 +67,16 @@ public class PanelMyShoppingCart extends JPanel {
 		add(label_1, BorderLayout.WEST);
 		
 		initSearchPanel();
+		setRadioButtonVisible(false);
 		initTable();
 		initDeleteUpdateAndCheckOut();
 
+	}
+	private void setRadioButtonVisible(boolean condition) {
+		rdbtnExact.setVisible(condition);
+		rdbtnAbove.setVisible(condition);
+		rdbtnBelow.setVisible(condition);		
+		rdbtnExact.setSelected(true);		
 	}
 	
 	private void initSearchPanel() {
@@ -75,9 +89,21 @@ public class PanelMyShoppingCart extends JPanel {
 		pnlSearch.add(lblSearchBy);
 		
 		cboSearch = new JComboBox<String>();
+		cboSearch.setBackground(new Color(0, 191, 255));
 		cboSearch.setMaximumRowCount(10);
 		cboSearch.setModel(new DefaultComboBoxModel<String>(new String[] {"ID", "Title", "Publisher", "Year Published", "ISBN", "Price", "Author", "Edition", "Volume"}));
 		cboSearch.setSelectedIndex(0);
+		
+		cboSearch.addItemListener(new ItemListener() {		
+			public void itemStateChanged(ItemEvent e) {
+				String result = (String) cboSearch.getSelectedItem();
+				if(result.equals("Price"))
+					setRadioButtonVisible(true);
+				else
+					setRadioButtonVisible(false);
+			}
+		});
+		
 		pnlSearch.add(cboSearch);
 		
 		tfSearch = new JTextField();
@@ -87,6 +113,7 @@ public class PanelMyShoppingCart extends JPanel {
 		tfSearch.setColumns(15);
 		
 		btnSearch = new JButton("Search");
+		btnSearch.setBackground(new Color(0, 191, 255));
 		pnlSearch.add(btnSearch);
 		
 		rdbtnExact = new JRadioButton("Exact",true);
@@ -112,6 +139,7 @@ public class PanelMyShoppingCart extends JPanel {
 				TableTitle.AUTHOR, TableTitle.EDITION, TableTitle.VOLUME});
 		
 		jTable = new JTable(table);
+		jTable.setBackground(new Color(0, 191, 255));
 		
 		scrollPane = new JScrollPane(jTable);
 		pnlMain.add(scrollPane, BorderLayout.CENTER);
@@ -127,16 +155,24 @@ public class PanelMyShoppingCart extends JPanel {
 		pnlDeleteUpdateAndCheckOut.add(pnlDeleteUpdate);
 		
 		btnDelete = new JButton("Delete");
+		btnDelete.setBackground(new Color(0, 191, 255));
 		pnlDeleteUpdate.add(btnDelete);
 		
 		btnUpdateAmount = new JButton("Update Amount");
+		btnUpdateAmount.setBackground(new Color(0, 191, 255));
 		pnlDeleteUpdate.add(btnUpdateAmount);
 		
 		JPanel pnlCheckOut = new JPanel();
 		pnlDeleteUpdateAndCheckOut.add(pnlCheckOut);
 		
-		btnCheckout = new JButton("Check-Out");
-		pnlCheckOut.add(btnCheckout);
+		btnCheckOut = new JButton("Check-Out");
+		btnCheckOut.setBackground(new Color(0, 191, 255));
+		btnCheckOut.setActionCommand("CheckOut");
+		pnlCheckOut.add(btnCheckOut);
+	}
+	
+	public void setSwitchActionListener(ActionListener al) {
+		btnCheckOut.addActionListener(al);
 	}
 
 }

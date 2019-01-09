@@ -16,6 +16,7 @@ import ckcc.OnlineBookStore.Front.Panel.PanelGoToShopping;
 import ckcc.OnlineBookStore.Front.Panel.PanelHistory;
 import ckcc.OnlineBookStore.Front.Panel.PanelHome;
 import ckcc.OnlineBookStore.Front.Panel.PanelMyShoppingCart;
+import ckcc.OnlineBookStore.Front.Panel.PanelBuy;
 
 public class MainFrame extends JFrame {
 

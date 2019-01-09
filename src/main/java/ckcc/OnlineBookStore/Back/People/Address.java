@@ -2,20 +2,23 @@ package ckcc.OnlineBookStore.Back.People;
 
 public class Address {
 
+	private int id;
 	private String street;
 	private String city;
 	private String state;
 	private String country;
 	private String postalCode;
-	private double shippingFree;
 	
-	public Address(String street, String city, String state, String country, String postalCode, double shippingFree) {
+	public Address(String street, String city, String state, String country, String postalCode) {
 		this.street = street;
 		this.city = city;
 		this.state = state;
 		this.country = country;
 		this.postalCode = postalCode;
-		this.shippingFree = shippingFree;
+	}
+	
+	public int getId() {
+		return id;
 	}
 
 	public String getStreet() {
@@ -36,10 +39,6 @@ public class Address {
 
 	public String getPostalCode() {
 		return postalCode;
-	}
-
-	public double getShippingFree() {
-		return shippingFree;
 	}
 	
 }

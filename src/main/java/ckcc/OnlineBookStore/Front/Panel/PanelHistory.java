@@ -18,6 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
+import java.awt.Color;
 
 public class PanelHistory extends JPanel {
 	
@@ -37,6 +38,7 @@ public class PanelHistory extends JPanel {
 		setLayout(new BorderLayout(0, 0));
 		
 		JLabel lblNewLabel = new JLabel("History");
+		lblNewLabel.setForeground(new Color(255, 0, 255));
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		add(lblNewLabel, BorderLayout.NORTH);
@@ -67,6 +69,7 @@ public class PanelHistory extends JPanel {
 		pnlSearch.add(lblSearchBy);
 		
 		cboSearch = new JComboBox<String>();
+		cboSearch.setBackground(new Color(0, 191, 255));
 		cboSearch.setModel(new DefaultComboBoxModel<String>(new String[] {"ID", "Name"}));
 		cboSearch.setSelectedIndex(0);
 		pnlSearch.add(cboSearch);
@@ -78,6 +81,7 @@ public class PanelHistory extends JPanel {
 		tfSearch.setColumns(15);
 		
 		btnSearch = new JButton("Search");
+		btnSearch.setBackground(new Color(0, 191, 255));
 		pnlSearch.add(btnSearch);
 	}
 	
@@ -95,6 +99,7 @@ public class PanelHistory extends JPanel {
 		pnlMain.add(pnlView, BorderLayout.SOUTH);
 		
 		btnView = new JButton("View");
+		btnView.setBackground(new Color(0, 191, 255));
 		pnlView.add(btnView);
 	}
 }

@@ -21,6 +21,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 import ckcc.OnlineBookStore.Back.Item.Book;
+import java.awt.Color;
 
 public class PanelAddNewItem extends JPanel {
 	
@@ -42,6 +43,8 @@ public class PanelAddNewItem extends JPanel {
 		initObj();
 		
 		btnAdd = new JButton("Add");
+		btnAdd.setBackground(new Color(0, 191, 255));
+		btnAdd.setForeground(new Color(0, 0, 0));
 		
 		btnAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -77,6 +80,8 @@ public class PanelAddNewItem extends JPanel {
 		pnlButton.add(btnAdd);
 		
 		btnClear = new JButton("Clear");
+		btnClear.setBackground(new Color(0, 191, 255));
+		btnClear.setForeground(new Color(0, 0, 0));
 		
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -99,6 +104,7 @@ public class PanelAddNewItem extends JPanel {
 	private void initObj() {
 		
 		JLabel lblNewLabel = new JLabel("Add New Book");
+		lblNewLabel.setForeground(new Color(255, 0, 255));
 		lblNewLabel.setVerticalAlignment(SwingConstants.TOP);
 		lblNewLabel.setPreferredSize(new Dimension(69, 41));
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);

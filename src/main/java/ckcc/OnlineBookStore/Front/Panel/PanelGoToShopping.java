@@ -14,6 +14,10 @@ import ckcc.OnlineBookStore.Back.Extra.TableTitle;
 import ckcc.OnlineBookStore.Back.Item.Book;
 
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -27,6 +31,7 @@ import java.awt.Dimension;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JRadioButton;
+import java.awt.Color;
 
 public class PanelGoToShopping extends JPanel {
 	
@@ -51,6 +56,7 @@ public class PanelGoToShopping extends JPanel {
 		setLayout(new BorderLayout(0, 0));
 		
 		JLabel lblShopping = new JLabel("Shopping");
+		lblShopping.setForeground(new Color(255, 0, 255));
 		lblShopping.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		lblShopping.setHorizontalAlignment(SwingConstants.CENTER);
 		add(lblShopping, BorderLayout.NORTH);
@@ -66,9 +72,17 @@ public class PanelGoToShopping extends JPanel {
 		add(lblNewLabel_1, BorderLayout.EAST);
 		
 		initSearchPanel();
+		setRadioButtonVisible(false);
 		initTable();
 		initBuyPanel();
 
+	}
+	
+	private void setRadioButtonVisible(boolean condition) {
+			rdbtnExact.setVisible(condition);
+			rdbtnAbove.setVisible(condition);
+			rdbtnBelow.setVisible(condition);		
+			rdbtnExact.setSelected(true);		
 	}
 	
 	private void initBuyPanel() {
@@ -76,6 +90,7 @@ public class PanelGoToShopping extends JPanel {
 		pnlMain.add(pnlBuy, BorderLayout.SOUTH);
 		
 		btnAddToCart = new JButton("Add to Cart");
+		btnAddToCart.setBackground(new Color(0, 191, 255));
 		pnlBuy.add(btnAddToCart);
 	}
 	
@@ -89,9 +104,21 @@ public class PanelGoToShopping extends JPanel {
 		pnlSearch.add(lblSearchBy);
 		
 		cboSearch = new JComboBox<String>();
+		cboSearch.setBackground(new Color(0, 191, 255));
 		cboSearch.setMaximumRowCount(10);
 		cboSearch.setModel(new DefaultComboBoxModel<String>(new String[] {"ID", "Title", "Publisher", "Year Published", "ISBN", "Price", "Author", "Editon", "Volume"}));
 		cboSearch.setSelectedIndex(0);
+		
+		cboSearch.addItemListener(new ItemListener() {		
+			public void itemStateChanged(ItemEvent e) {
+				String result = (String) cboSearch.getSelectedItem();
+				if(result.equals("Price"))
+					setRadioButtonVisible(true);
+				else
+					setRadioButtonVisible(false);
+			}
+		});
+		
 		pnlSearch.add(cboSearch);
 		
 		tfSearch = new JTextField();
@@ -101,6 +128,7 @@ public class PanelGoToShopping extends JPanel {
 		tfSearch.setColumns(15);
 		
 		btnSearch = new JButton("Search");
+		btnSearch.setBackground(new Color(0, 191, 255));
 		pnlSearch.add(btnSearch);
 		
 		rdbtnExact = new JRadioButton("Exact",true);
