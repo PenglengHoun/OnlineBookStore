@@ -1,36 +1,68 @@
 package ckcc.OnlineBookStore.Back.People;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import ckcc.OnlineBookStore.Back.Order.Cart;
+
+@Entity
+@Table(name = "customer")
 public class Customer {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	private int id;
+	
+	@Column(name = "name")
 	private String name;
+	
+	@Column(name = "email")
 	private String email;
+	
+	@Column(name = "phone")
 	private String phone;
-	private Address shippingAddress;
-	private Address billingAddress;
 	
-	public Customer(String name, Address shippingAddress, Address billingAddress) {
-		this.name = name;
-		this.shippingAddress = shippingAddress;
-		this.billingAddress = billingAddress;
-	}
+	@OneToMany(cascade = CascadeType.ALL)
+	@JoinColumn(name = "customer_id")
+	private List<Address> address;
 	
-	public void checkOut() {
+	@OneToOne(mappedBy = "customer")
+	private Cart cart;
+	
+	public Customer() {
 		
 	}
 	
-//	public void placeOrder(Cart shoppingCart) {
-//		this.shoppingCart = shoppingCart;
-//	}
-//	
-//	public Cart cancelOrder() {
-//		Cart temp = new Cart(shoppingCart);
-//		shippingAddress = null;
-//		billingAddress = null;
-//		shoppingCart = null;
-//		return temp;
-//	}
-
+	public Customer(String name, String email, String phone, Address billingAddress) {
+		this.name = name;
+		this.email = email;
+		this.phone = phone;
+		address = new ArrayList<Address>();
+		address.add(billingAddress);
+	}
+	
+	public Customer(String name, String email, String phone, Address billingAddress, Address shippingAddress) {
+		this.name = name;
+		this.email = email;
+		this.phone = phone;
+		address = new ArrayList<Address>();
+		address.add(billingAddress);
+		address.add(shippingAddress);
+	}
+	
 	public int getId() {
 		return id;
 	}
@@ -38,7 +70,7 @@ public class Customer {
 	public String getName() {
 		return name;
 	}
-	
+
 	public String getEmail() {
 		return email;
 	}
@@ -46,12 +78,13 @@ public class Customer {
 	public String getPhone() {
 		return phone;
 	}
-	public Address getShippingAddress() {
-		return shippingAddress;
+
+	public List<Address> getAddress() {
+		return address;
 	}
 
-	public Address getBillingAddress() {
-		return billingAddress;
+	public Cart getCart() {
+		return cart;
 	}
-	
+
 }

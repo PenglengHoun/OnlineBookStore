@@ -20,7 +20,10 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
+import ckcc.OnlineBookStore.Back.Extra.Data;
 import ckcc.OnlineBookStore.Back.Item.Book;
+import ckcc.OnlineBookStore.Back.Stock.BookInStock;
+
 import java.awt.Color;
 
 public class PanelAddNewItem extends JPanel {
@@ -36,6 +39,7 @@ public class PanelAddNewItem extends JPanel {
 	private JPanel pnlButton;
 	private JButton btnAdd;
 	private JButton btnClear;
+	private JTextField tfQty;
 
 	public PanelAddNewItem() {
 		setLayout(new BorderLayout(0, 0));
@@ -48,11 +52,7 @@ public class PanelAddNewItem extends JPanel {
 		
 		btnAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				SessionFactory factory = new Configuration().configure("hibernate.cfg.xml").addAnnotatedClass(Book.class).buildSessionFactory();
-				Session session = factory.getCurrentSession();
-				
-				try {
+
 					String title = tfTitle.getText();
 					String publisher = tfPublisher.getText();
 					String yearPublished = tfYearPublished.getText();
@@ -61,17 +61,15 @@ public class PanelAddNewItem extends JPanel {
 					int edition = Integer.parseInt(tfEdition.getText());
 					int volume = Integer.parseInt(tfVolume.getText());
 					double price = Double.parseDouble(tfPrice.getText());
-			
-					Book book = new Book(title,publisher,yearPublished,ISBN,price,author,edition,volume);
+					int qty = Integer.parseInt(tfQty.getText());
 					
-					session.beginTransaction();
-					session.save(book);
-					session.getTransaction().commit();
-					session.close();
-				}
-				finally {
-					factory.close();
-				}
+					Book book = new Book(title,publisher,yearPublished,ISBN,price,author,edition,volume);
+					BookInStock bis = new BookInStock(book, qty);
+					
+					Data.addBookInStockIntoData(bis);
+				
+				tfTitle.requestFocus();
+				tfTitle.select(0, tfTitle.getText().length());
 			}
 		});
 		
@@ -93,6 +91,7 @@ public class PanelAddNewItem extends JPanel {
 				tfEdition.setText("");
 				tfVolume.setText("");
 				tfPrice.setText("");
+				tfQty.setText("");
 				tfTitle.requestFocus();
 			}
 		});
@@ -121,63 +120,70 @@ public class PanelAddNewItem extends JPanel {
 		
 		JPanel pnlControl = new JPanel();
 		pnlOut.add(pnlControl);
-		pnlControl.setLayout(new GridLayout(8, 2, 20, 20));
+		pnlControl.setLayout(new GridLayout(10, 2, 0, 20));
 		
 		JLabel lblTitle = new JLabel("Title :");
 		pnlControl.add(lblTitle);
 		
 		tfTitle = new JTextField();
 		pnlControl.add(tfTitle);
-		tfTitle.setColumns(10);
+		tfTitle.setColumns(20);
 		
 		JLabel lblPublisher = new JLabel("Publisher :");
 		pnlControl.add(lblPublisher);
 		
 		tfPublisher = new JTextField();
 		pnlControl.add(tfPublisher);
-		tfPublisher.setColumns(10);
+		tfPublisher.setColumns(20);
 		
 		JLabel lblYearPublished = new JLabel("Year Published :");
 		pnlControl.add(lblYearPublished);
 		
 		tfYearPublished = new JTextField();
 		pnlControl.add(tfYearPublished);
-		tfYearPublished.setColumns(10);
+		tfYearPublished.setColumns(20);
 		
 		JLabel lblIsbn = new JLabel("ISBN :");
 		pnlControl.add(lblIsbn);
 		
 		tfISBN = new JTextField();
 		pnlControl.add(tfISBN);
-		tfISBN.setColumns(10);
+		tfISBN.setColumns(20);
 		
 		JLabel lblAuthor = new JLabel("Author :");
 		pnlControl.add(lblAuthor);
 		
 		tfAuthor = new JTextField();
 		pnlControl.add(tfAuthor);
-		tfAuthor.setColumns(10);
+		tfAuthor.setColumns(20);
 		
 		JLabel lblEdition = new JLabel("Edition :");
 		pnlControl.add(lblEdition);
 		
 		tfEdition = new JTextField();
 		pnlControl.add(tfEdition);
-		tfEdition.setColumns(10);
+		tfEdition.setColumns(20);
 		
 		JLabel lblVolumn = new JLabel("Volume :");
 		pnlControl.add(lblVolumn);
 		
 		tfVolume = new JTextField();
 		pnlControl.add(tfVolume);
-		tfVolume.setColumns(10);
+		tfVolume.setColumns(20);
 		
 		JLabel lblPrice = new JLabel("Price :");
 		pnlControl.add(lblPrice);
 		
 		tfPrice = new JTextField();
 		pnlControl.add(tfPrice);
-		tfPrice.setColumns(10);
+		tfPrice.setColumns(20);
+		
+		JLabel lblQuantity = new JLabel("Quantity :");
+		pnlControl.add(lblQuantity);
+		
+		tfQty = new JTextField();
+		pnlControl.add(tfQty);
+		tfQty.setColumns(10);
 		
 		pnlButton = new JPanel();
 		pnlButton.setBorder(new EmptyBorder(20, 0, 0, 0));

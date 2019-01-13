@@ -1,24 +1,30 @@
 package ckcc.OnlineBookStore.Front.Panel;
 
-import javax.swing.JPanel;
-import javax.swing.JLabel;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
-import ckcc.OnlineBookStore.Back.Extra.TableTitle;
-
-import java.awt.Font;
-import java.awt.FlowLayout;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JTextField;
-import java.awt.Dimension;
-import javax.swing.JButton;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.JScrollPane;
-import java.awt.Color;
+import ckcc.OnlineBookStore.Back.Extra.Data;
+import ckcc.OnlineBookStore.Back.Order.Cart;
+import ckcc.OnlineBookStore.Back.People.Customer;
+import ckcc.OnlineBookStore.Front.JDialog.Invoice;
 
 public class PanelHistory extends JPanel {
 	
@@ -86,10 +92,11 @@ public class PanelHistory extends JPanel {
 	}
 	
 	private void initTable() {
-		table = new DefaultTableModel(null, new Object[] {"ID", "Name"});
+		table = new DefaultTableModel(null, new Object[] {"ID", "Name", "Date"});
+		
+		refreshTable();
 		
 		jTable = new JTable(table);
-		
 		scrollPane = new JScrollPane(jTable);
 		pnlMain.add(scrollPane, BorderLayout.CENTER);
 	}
@@ -100,6 +107,28 @@ public class PanelHistory extends JPanel {
 		
 		btnView = new JButton("View");
 		btnView.setBackground(new Color(0, 191, 255));
+		
+		btnView.addActionListener(new ActionListener() {		
+			public void actionPerformed(ActionEvent e) {
+				
+				Cart cart = Data.getOneCart(Integer.parseInt("" + table.getValueAt(jTable.getSelectedRow(), 0)));
+				try {
+					Invoice dialog = new Invoice(cart);
+					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+					dialog.setVisible(true);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		
 		pnlView.add(btnView);
+	}
+	
+	private void refreshTable() {
+		ArrayList<Cart> list = Data.getCart();
+		table.getDataVector().removeAllElements();
+		for(Cart temp : list)
+			table.addRow(temp.getInfo());
 	}
 }

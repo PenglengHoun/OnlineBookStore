@@ -1,31 +1,36 @@
 package ckcc.OnlineBookStore.Front.Panel;
 
-import javax.swing.JPanel;
-import javax.swing.JLabel;
 import java.awt.BorderLayout;
-import java.awt.Font;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableModel;
-
-import ckcc.OnlineBookStore.Back.Extra.TableTitle;
-
-import javax.swing.JComboBox;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JTextField;
+import java.awt.Color;
 import java.awt.Dimension;
-import javax.swing.JButton;
-import javax.swing.JRadioButton;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import java.awt.Color;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableModel;
+
+import ckcc.OnlineBookStore.Back.Extra.Data;
+import ckcc.OnlineBookStore.Back.Extra.TableTitle;
+import ckcc.OnlineBookStore.Back.Extra.TempOrderDetail;
+import ckcc.OnlineBookStore.Back.Item.Book;
+import ckcc.OnlineBookStore.Back.Order.Cart;
+import ckcc.OnlineBookStore.Back.Order.OrderDetail;
+import ckcc.OnlineBookStore.Front.EventClass.EventRemoveFocusTable;
+import ckcc.OnlineBookStore.Front.EventClass.SearchButtonHelper;
 
 public class PanelBuy extends JPanel {
 	
@@ -34,19 +39,16 @@ public class PanelBuy extends JPanel {
 	private JTextField tfSearch;
 	private JComboBox<String> cboSearch;
 	private JButton btnSearch;
-	private JRadioButton rdbtnExact;
-	private JRadioButton rdbtnBelow;
-	private JRadioButton rdbtnAbove;
-	private ButtonGroup bg;
 	
 	private DefaultTableModel table;
 	private JTable jTable;
 	private JScrollPane scrollPane;
 	
 	private JButton btnDelete;
-	private JButton btnUpdateAmount;
+	private JButton btnUpdateQty;
 	private JButton btnCheckOut;
-
+	private JLabel lblTotal;
+	
 	public PanelBuy() {
 		setLayout(new BorderLayout(0, 0));
 		
@@ -67,16 +69,9 @@ public class PanelBuy extends JPanel {
 		add(label_1, BorderLayout.WEST);
 		
 		initSearchPanel();
-		setRadioButtonVisible(false);
 		initTable();
 		initDeleteUpdateAndCheckOut();
-
-	}
-	private void setRadioButtonVisible(boolean condition) {
-		rdbtnExact.setVisible(condition);
-		rdbtnAbove.setVisible(condition);
-		rdbtnBelow.setVisible(condition);		
-		rdbtnExact.setSelected(true);		
+		
 	}
 	
 	private void initSearchPanel() {
@@ -91,18 +86,8 @@ public class PanelBuy extends JPanel {
 		cboSearch = new JComboBox<String>();
 		cboSearch.setBackground(new Color(0, 191, 255));
 		cboSearch.setMaximumRowCount(10);
-		cboSearch.setModel(new DefaultComboBoxModel<String>(new String[] {"ID", "Title", "Publisher", "Year Published", "ISBN", "Price", "Author", "Edition", "Volume"}));
+		cboSearch.setModel(new DefaultComboBoxModel<String>(new String[] {TableTitle.ID, TableTitle.BOOK_ID}));
 		cboSearch.setSelectedIndex(0);
-		
-		cboSearch.addItemListener(new ItemListener() {		
-			public void itemStateChanged(ItemEvent e) {
-				String result = (String) cboSearch.getSelectedItem();
-				if(result.equals("Price"))
-					setRadioButtonVisible(true);
-				else
-					setRadioButtonVisible(false);
-			}
-		});
 		
 		pnlSearch.add(cboSearch);
 		
@@ -114,35 +99,72 @@ public class PanelBuy extends JPanel {
 		
 		btnSearch = new JButton("Search");
 		btnSearch.setBackground(new Color(0, 191, 255));
+		
+		btnSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {			
+				if(tfSearch.getText().equals(""))	return;				
+				SearchButtonHelper help = new SearchButtonHelper((String)cboSearch.getSelectedItem());
+				
+				ArrayList<TempOrderDetail> list;
+				
+				if(help.isString())
+					list = Data.getTempOrderDetail(help.getType(), tfSearch.getText());
+				else
+					list = Data.getTempOrderDetail(help.getType(), Double.parseDouble(tfSearch.getText()));
+				
+				if(list.isEmpty()) {
+					JOptionPane.showMessageDialog(null, "!!!There is no matched item!!!", "No matched item", JOptionPane.INFORMATION_MESSAGE);
+					refreshTable();
+					return;
+				}
+				
+				table.getDataVector().removeAllElements();
+				for(TempOrderDetail temp : list)
+					table.addRow(temp.getInfo());
+			}
+		});	
+		
 		pnlSearch.add(btnSearch);
 		
-		rdbtnExact = new JRadioButton("Exact",true);
-		pnlSearch.add(rdbtnExact);
+		JLabel label_2 = new JLabel("                             ");
+		pnlSearch.add(label_2);
 		
-		rdbtnBelow = new JRadioButton("Below",false);
-		pnlSearch.add(rdbtnBelow);
-		
-		rdbtnAbove = new JRadioButton("Above",false);
-		pnlSearch.add(rdbtnAbove);
-		
-		bg = new ButtonGroup();
-		bg.add(rdbtnAbove);
-		bg.add(rdbtnBelow);
-		bg.add(rdbtnExact);
+		lblTotal = new JLabel("Total : 0");
+		lblTotal.setForeground(Color.RED);
+		pnlSearch.add(lblTotal);
 	
 	}
 	
 	private void initTable() {
 		
-		table = new DefaultTableModel(null, new Object[] {TableTitle.ID,TableTitle.TITLE,
-				TableTitle.PUBLISHER,TableTitle.YEAR_PUBLISHED, TableTitle.ISBN, TableTitle.PRICE, 
-				TableTitle.AUTHOR, TableTitle.EDITION, TableTitle.VOLUME});
+		table = new DefaultTableModel(null, new Object[] {TableTitle.ID, TableTitle.BOOK_ID, TableTitle.TITLE,
+				TableTitle.PRICE, TableTitle.QTY, TableTitle.DISCOUNT, TableTitle.SUB_TOTAL});
 		
 		jTable = new JTable(table);
-		jTable.setBackground(new Color(0, 191, 255));
+		jTable.setBackground(Color.WHITE);
+		jTable.addMouseListener(new EventRemoveFocusTable(jTable));
+		
+		jTable.getTableHeader().setReorderingAllowed(false);
+		
+		refreshTable();
+		refreshTotalLabel();
 		
 		scrollPane = new JScrollPane(jTable);
 		pnlMain.add(scrollPane, BorderLayout.CENTER);
+	}
+	
+	private void refreshTotalLabel() {
+		double sum = 0;
+		for(int i=0; i<table.getRowCount(); i++)
+			sum += Double.parseDouble("" + table.getValueAt(i, 6));
+		lblTotal.setText("Total : " + sum);
+	}
+	
+	private void refreshTable() {
+		ArrayList<TempOrderDetail> list = Data.getTempOrderDetail();
+		table.getDataVector().removeAllElements();
+		for(TempOrderDetail temp : list)
+			table.addRow(temp.getInfo());
 	}
 	
 	private void initDeleteUpdateAndCheckOut() {
@@ -156,11 +178,76 @@ public class PanelBuy extends JPanel {
 		
 		btnDelete = new JButton("Delete");
 		btnDelete.setBackground(new Color(0, 191, 255));
+		
+		btnDelete.addActionListener(new ActionListener() {		
+			public void actionPerformed(ActionEvent e) {
+				if(jTable.getSelectedRowCount() == 0) return;
+				
+				try {
+					int decision = Integer.parseInt("" + JOptionPane.showConfirmDialog(null, "Are you sure?", "Delete", JOptionPane.YES_NO_OPTION));
+					if(decision !=0) return;
+				}
+				finally {
+					
+				}
+				
+				int bookId = Integer.parseInt("" + table.getValueAt(jTable.getSelectedRow(), 1));
+				Book book = Data.getOneBook(bookId);
+				int returnQty = book.getBookInStock().getQty() + Integer.parseInt("" + table.getValueAt(jTable.getSelectedRow(), 4));
+				
+				Data.updateStock("qty", book.getBookInStock().getId(), returnQty);
+				Data.deleteTempOrderDetail(Integer.parseInt("" + table.getValueAt(jTable.getSelectedRow(), 0)));
+				table.removeRow(jTable.getSelectedRow());
+				
+				refreshTotalLabel();
+			}
+		});
+		
 		pnlDeleteUpdate.add(btnDelete);
 		
-		btnUpdateAmount = new JButton("Update Amount");
-		btnUpdateAmount.setBackground(new Color(0, 191, 255));
-		pnlDeleteUpdate.add(btnUpdateAmount);
+		btnUpdateQty = new JButton("Update Amount");
+		btnUpdateQty.setBackground(new Color(0, 191, 255));
+		
+		btnUpdateQty.addActionListener(new ActionListener() {		
+			public void actionPerformed(ActionEvent e) {
+				
+				if(jTable.getSelectedRowCount() == 0) return;
+				try {
+					
+					String result = JOptionPane.showInputDialog(null, "Input New Quantity :", "Input Amount", JOptionPane.PLAIN_MESSAGE);
+					if(result.equals("")) return;
+					
+					int qty = Integer.parseInt(result);
+					if(qty<0) {
+						JOptionPane.showMessageDialog(null, "!!!Input Negative Number!!!", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					Book book = Data.getOneBook(Integer.parseInt("" + table.getValueAt(jTable.getSelectedRow(), 1)));
+					if(qty > book.getBookInStock().getQty()) {
+						JOptionPane.showMessageDialog(null, "!!!Not Enough Item!!!", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					
+					int newQty = book.getBookInStock().getQty() + Integer.parseInt("" + table.getValueAt(jTable.getSelectedRow(), 4)) - qty;
+					
+					table.setValueAt(qty, jTable.getSelectedRow(), 4);				
+					Data.updateStock("qty", book.getBookInStock().getId(), newQty);
+					Data.updateTempOrderDetail("qty", Integer.parseInt("" + table.getValueAt(jTable.getSelectedRow(), 0)), qty);
+					
+					TempOrderDetail temp = new TempOrderDetail(0, qty, Double.parseDouble(""+table.getValueAt(jTable.getSelectedRow(), 3)), Double.parseDouble(""+table.getValueAt(jTable.getSelectedRow(), 5)));			
+					Data.updateTempOrderDetail("subTotal", Integer.parseInt("" + table.getValueAt(jTable.getSelectedRow(), 0)), temp.getSubTotal());
+					table.setValueAt(temp.getSubTotal(), jTable.getSelectedRow(), 6);	
+					refreshTotalLabel();
+				}
+				catch(NumberFormatException ex) {			
+					JOptionPane.showMessageDialog(null, "!!!Please Input Number!!!", "Error", JOptionPane.ERROR_MESSAGE);
+				}
+				catch(Exception ex) {		
+				}
+			}
+		});
+		
+		pnlDeleteUpdate.add(btnUpdateQty);
 		
 		JPanel pnlCheckOut = new JPanel();
 		pnlDeleteUpdateAndCheckOut.add(pnlCheckOut);

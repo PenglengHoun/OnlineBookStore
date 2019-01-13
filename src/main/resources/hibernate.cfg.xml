@@ -24,6 +24,13 @@
 
 		<!-- Set the current session context -->
 		<property name="current_session_context_class">thread</property>
+		<mapping class="ckcc.OnlineBookStore.Back.Stock.BookInStock"/>
+		<mapping class="ckcc.OnlineBookStore.Back.Item.Book"/>
+		<mapping class="ckcc.OnlineBookStore.Back.Order.Cart"/>
+		<mapping class="ckcc.OnlineBookStore.Back.Order.OrderDetail"/>
+		<mapping class="ckcc.OnlineBookStore.Back.People.Address"/>
+		<mapping class="ckcc.OnlineBookStore.Back.People.Customer"/>
+		<mapping class="ckcc.OnlineBookStore.Back.Extra.TempOrderDetail"/>
  
     </session-factory>
 

@@ -11,5 +11,9 @@ public class TableTitle {
 	public static String AUTHOR = "Author";
 	public static String EDITION = "Edition";
 	public static String VOLUME = "Volume";
+	public static String QTY = "Quantity";
+	public static String DISCOUNT = "Discount";
+	public static String BOOK_ID = "Book ID";
+	public static String SUB_TOTAL = "Sub Total";
 	
 }

@@ -5,7 +5,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import ckcc.OnlineBookStore.Back.Stock.BookInStock;
 
 @Entity
 @Table(name = "book")
@@ -39,6 +42,13 @@ public class Book {
 	
 	@Column(name = "price")
 	private double price;
+	
+	@OneToOne(mappedBy = "book")
+	private BookInStock bis;
+	
+	public Book() {
+		
+	}
 	
 	public Book(String title, String publisher, String yearPublished, String ISBN, double price,
 			    String author, int edition, int volume) {
@@ -87,6 +97,16 @@ public class Book {
 
 	public double getPrice() {
 		return price;
+	}
+	
+	public BookInStock getBookInStock() {
+		return bis;
+	}
+	
+	public Object[] getInfo() {
+		return new Object[] {
+			id, title, publisher, yearPublished, ISBN, price, author, edition, volume, bis.getQty()	
+		};
 	}
 
 }

@@ -1,37 +1,33 @@
 package ckcc.OnlineBookStore.Front.Panel;
 
-import javax.swing.JPanel;
-import javax.swing.JLabel;
 import java.awt.BorderLayout;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableModel;
-
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-
-import ckcc.OnlineBookStore.Back.Extra.TableTitle;
-import ckcc.OnlineBookStore.Back.Item.Book;
-
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.List;
+import java.util.ArrayList;
 
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
-import java.awt.FlowLayout;
-
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import java.awt.Dimension;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JRadioButton;
-import java.awt.Color;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableModel;
+
+import ckcc.OnlineBookStore.Back.Extra.Data;
+import ckcc.OnlineBookStore.Back.Extra.TableTitle;
+import ckcc.OnlineBookStore.Back.Extra.TempOrderDetail;
+import ckcc.OnlineBookStore.Back.Item.Book;
+import ckcc.OnlineBookStore.Back.Order.Cart;
+import ckcc.OnlineBookStore.Front.EventClass.EventRemoveFocusTable;
+import ckcc.OnlineBookStore.Front.EventClass.SearchButtonHelper;
 
 public class PanelGoToShopping extends JPanel {
 	
@@ -46,12 +42,13 @@ public class PanelGoToShopping extends JPanel {
 	private JScrollPane scrollPane;
 	
 	private JButton btnAddToCart;
-	
-	private JRadioButton rdbtnExact;
-	private JRadioButton rdbtnBelow;
-	private JRadioButton rdbtnAbove;
-	private ButtonGroup bg;
 
+	private Cart cart;
+	
+	public Cart getCart() {
+		return cart;
+	}
+	
 	public PanelGoToShopping() {
 		setLayout(new BorderLayout(0, 0));
 		
@@ -72,17 +69,11 @@ public class PanelGoToShopping extends JPanel {
 		add(lblNewLabel_1, BorderLayout.EAST);
 		
 		initSearchPanel();
-		setRadioButtonVisible(false);
 		initTable();
 		initBuyPanel();
+		
+		cart = new Cart();
 
-	}
-	
-	private void setRadioButtonVisible(boolean condition) {
-			rdbtnExact.setVisible(condition);
-			rdbtnAbove.setVisible(condition);
-			rdbtnBelow.setVisible(condition);		
-			rdbtnExact.setSelected(true);		
 	}
 	
 	private void initBuyPanel() {
@@ -91,7 +82,62 @@ public class PanelGoToShopping extends JPanel {
 		
 		btnAddToCart = new JButton("Add to Cart");
 		btnAddToCart.setBackground(new Color(0, 191, 255));
+		
+		btnAddToCart.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				if(jTable.getSelectedRowCount() == 0) return;
+				
+				int qtyColumn;
+				int id;
+				double price;
+				double discount = 0;
+				try {
+					// INPUT QTY
+					qtyColumn = Integer.parseInt("" + table.getValueAt(jTable.getSelectedRow(), 9));				
+					id = Integer.parseInt("" + table.getValueAt(jTable.getSelectedRow(), 0));
+					price = Double.parseDouble("" + table.getValueAt(jTable.getSelectedRow(), 5));
+					
+					String result = JOptionPane.showInputDialog(null, "Input Quantity :", "Input Quantity", JOptionPane.PLAIN_MESSAGE);
+					if(result.equals("")) return;
+					
+					int qty = Integer.parseInt(result);
+					if(qty > qtyColumn) {
+						JOptionPane.showMessageDialog(null, "!!!Not Enough Item!!!", "Error", JOptionPane.WARNING_MESSAGE);
+						return;
+					}
+					if(qty < 0) {
+						JOptionPane.showMessageDialog(null, "!!!Please input positive Number!!!", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					table.setValueAt(qtyColumn - qty, jTable.getSelectedRow(), 9);
+					
+					// INPUT DISCOUNT
+					String result1 = JOptionPane.showInputDialog(null, "Input New Discount :", "Input New Discount", JOptionPane.PLAIN_MESSAGE);
+					if(result1.equals("")) {}
+					
+					discount = Double.parseDouble(result1);
+					if(discount < 0 || discount > 100) {
+						JOptionPane.showMessageDialog(null, "!!!Please input between 0-100!!!", "Error", JOptionPane.ERROR_MESSAGE);
+					}				
+					
+					TempOrderDetail tempOrderDetail = new TempOrderDetail(id, qty, price, discount);					
+					Data.addTempOrderDetailIntoData(tempOrderDetail);
+					Data.updateStock("discount", jTable.getSelectedRow() + 1, discount);
+					Data.updateStock("qty", jTable.getSelectedRow() + 1, qtyColumn - qty);
+					
+				}
+				catch(NumberFormatException ex) {			
+					JOptionPane.showMessageDialog(null, "!!!Please Input Number!!!", "Error", JOptionPane.ERROR_MESSAGE);
+				}
+				catch(Exception ex) {		
+				}	
+				
+			}
+		});
+
 		pnlBuy.add(btnAddToCart);
+		
 	}
 	
 	private void initSearchPanel() {
@@ -106,18 +152,14 @@ public class PanelGoToShopping extends JPanel {
 		cboSearch = new JComboBox<String>();
 		cboSearch.setBackground(new Color(0, 191, 255));
 		cboSearch.setMaximumRowCount(10);
-		cboSearch.setModel(new DefaultComboBoxModel<String>(new String[] {"ID", "Title", "Publisher", "Year Published", "ISBN", "Price", "Author", "Editon", "Volume"}));
+		cboSearch.setModel(new DefaultComboBoxModel<String>(
+				new String[] {
+						TableTitle.ID, TableTitle.TITLE, TableTitle.PUBLISHER, TableTitle.YEAR_PUBLISHED,
+						TableTitle.ISBN, TableTitle.PRICE, TableTitle.AUTHOR, TableTitle.EDITION, TableTitle.VOLUME,
+						     }
+														   )
+						  );
 		cboSearch.setSelectedIndex(0);
-		
-		cboSearch.addItemListener(new ItemListener() {		
-			public void itemStateChanged(ItemEvent e) {
-				String result = (String) cboSearch.getSelectedItem();
-				if(result.equals("Price"))
-					setRadioButtonVisible(true);
-				else
-					setRadioButtonVisible(false);
-			}
-		});
 		
 		pnlSearch.add(cboSearch);
 		
@@ -129,45 +171,57 @@ public class PanelGoToShopping extends JPanel {
 		
 		btnSearch = new JButton("Search");
 		btnSearch.setBackground(new Color(0, 191, 255));
+		
+		btnSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {			
+				if(tfSearch.getText().equals(""))	return;				
+				SearchButtonHelper help = new SearchButtonHelper((String)cboSearch.getSelectedItem());
+				
+				ArrayList<Book> bookList;
+				
+				if(help.isString())
+					bookList = Data.getBook(help.getType(), tfSearch.getText());
+				else
+					bookList = Data.getBook(help.getType(), Double.parseDouble(tfSearch.getText()));
+				
+				if(bookList.isEmpty()) {
+					JOptionPane.showMessageDialog(null, "!!!There is no matched item!!!", "No matched item", JOptionPane.INFORMATION_MESSAGE);
+					refreshTable();
+					return;
+				}
+				
+				table.getDataVector().removeAllElements();
+				for(Book temp : bookList)
+					table.addRow(temp.getInfo());
+			}
+		});		
 		pnlSearch.add(btnSearch);
-		
-		rdbtnExact = new JRadioButton("Exact",true);
-		pnlSearch.add(rdbtnExact);
-		
-		rdbtnBelow = new JRadioButton("Below",false);
-		pnlSearch.add(rdbtnBelow);
-		
-		rdbtnAbove = new JRadioButton("Above",false);
-		pnlSearch.add(rdbtnAbove);
-		
-		bg = new ButtonGroup();
-		
-		bg.add(rdbtnExact);
-		bg.add(rdbtnBelow);
-		bg.add(rdbtnAbove);
 	}
 	
 	private void initTable() {
 		
 		table = new DefaultTableModel(null, new Object[] {TableTitle.ID,TableTitle.TITLE,
 				TableTitle.PUBLISHER,TableTitle.YEAR_PUBLISHED, TableTitle.ISBN, TableTitle.PRICE, 
-				TableTitle.AUTHOR, TableTitle.EDITION, TableTitle.VOLUME});
+				TableTitle.AUTHOR, TableTitle.EDITION, TableTitle.VOLUME, TableTitle.QTY});
 		
 		jTable = new JTable(table);
+		jTable.setAutoCreateRowSorter(true);
+		jTable.getTableHeader().setReorderingAllowed(false);
 		
+		jTable.addMouseListener(new EventRemoveFocusTable(jTable));
+
 		scrollPane = new JScrollPane(jTable);
 		pnlMain.add(scrollPane, BorderLayout.CENTER);
-		
-		SessionFactory factory = new Configuration().configure("hibernate.cfg.xml").addAnnotatedClass(Book.class).buildSessionFactory();
-		Session session = factory.getCurrentSession();
-		try {
-			session.beginTransaction();
-			//List<Book> bookList = session.get
-		}
-		finally {
-			
-		}
-		
+
+		refreshTable();
+
+	}
+	
+	private void refreshTable() {
+		ArrayList<Book> bookList = Data.getBook();
+		table.getDataVector().removeAllElements();
+		for(Book temp : bookList)
+			table.addRow(temp.getInfo());
 	}
 
 }

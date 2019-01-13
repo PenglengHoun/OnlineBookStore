@@ -5,20 +5,24 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import ckcc.OnlineBookStore.Front.EventClass.EventMenuButton;
+import ckcc.OnlineBookStore.Back.Extra.TempOrderDetail;
+import ckcc.OnlineBookStore.Back.Order.Cart;
+import ckcc.OnlineBookStore.Back.Order.OrderDetail;
 import ckcc.OnlineBookStore.Front.Panel.PanelAddNewItem;
 import ckcc.OnlineBookStore.Front.Panel.PanelGoToShopping;
 import ckcc.OnlineBookStore.Front.Panel.PanelHistory;
 import ckcc.OnlineBookStore.Front.Panel.PanelHome;
 import ckcc.OnlineBookStore.Front.Panel.PanelMyShoppingCart;
-import ckcc.OnlineBookStore.Front.Panel.PanelBuy;
+import javax.swing.UIManager;
 
-public class MainFrame extends JFrame {
+public class MainFrame extends JFrame implements ActionListener{
 
 	private JPanel contentPane;
 	
@@ -34,7 +38,7 @@ public class MainFrame extends JFrame {
 	private CardLayout cardLayout;
 	private JButton btnHistory;
 	// END MAIN
-
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -60,10 +64,13 @@ public class MainFrame extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 		
+		TempOrderDetail.reset();
+		
 		initMainPanel();
 		initButtonPanel();
 		
 	}
+
 	
 	private void initMainPanel() {
 		pnlMain = new JPanel();
@@ -71,53 +78,65 @@ public class MainFrame extends JFrame {
 		
 		cardLayout = new CardLayout();
 		
-		pnlMain.setLayout(cardLayout);	
+		pnlMain.setLayout(cardLayout);
 		pnlMain.add("Home",new PanelHome());
-		pnlMain.add("AddNewItem", new PanelAddNewItem());
-		pnlMain.add("GoToShopping", new PanelGoToShopping());
-		pnlMain.add("MyShoppingCart", new PanelMyShoppingCart());
-		pnlMain.add("History", new PanelHistory());
-		
 		cardLayout.show(pnlMain, "Home");
 	}
 	
 	private void initButtonPanel() {
 		JPanel pnlButton = new JPanel();
-		pnlButton.setBackground(Color.WHITE);
+		pnlButton.setBackground(UIManager.getColor("Button.background"));
 		contentPane.add(pnlButton, BorderLayout.WEST);
 		pnlButton.setLayout(new GridLayout(5, 1, 0, 0));
 		
-		EventMenuButton event = new EventMenuButton(pnlMain,cardLayout);
-		
 		btnHome = new JButton("Home");
 		btnHome.setBackground(new Color(0, 191, 255));
-		btnHome.setActionCommand("Home");
-		btnHome.addActionListener(event);
+		btnHome.addActionListener(this);
 		pnlButton.add(btnHome);
 		
 		btnAddNewItem = new JButton("Add New Book");
 		btnAddNewItem.setBackground(new Color(0, 191, 255));
-		btnAddNewItem.setActionCommand("Add New Item");
-		btnAddNewItem.addActionListener(event);
+		btnAddNewItem.addActionListener(this);
 		pnlButton.add(btnAddNewItem);
 		
 		btnGoToShopping = new JButton("Go to Shopping");
 		btnGoToShopping.setBackground(new Color(0, 191, 255));
-		btnGoToShopping.setActionCommand("Go To Shopping");
-		btnGoToShopping.addActionListener(event);
+		btnGoToShopping.addActionListener(this);
 		pnlButton.add(btnGoToShopping);
 		
 		btnMyShoppingCart = new JButton("My Shopping Cart");
 		btnMyShoppingCart.setBackground(new Color(0, 191, 255));
-		btnMyShoppingCart.setActionCommand("My Shopping Cart");
-		btnMyShoppingCart.addActionListener(event);
+		btnMyShoppingCart.addActionListener(this);
 		pnlButton.add(btnMyShoppingCart);
 		
-		btnHistory = new JButton("History");
-		btnHistory.setBackground(new Color(0, 191, 255));
-		btnHistory.setActionCommand("History");
-		btnHistory.addActionListener(event);
-		pnlButton.add(btnHistory);
+//		btnHistory = new JButton("History");
+//		btnHistory.setBackground(new Color(0, 191, 255));
+//		btnHistory.addActionListener(this);
+//		pnlButton.add(btnHistory);
+		
+	}
+	
+	public void actionPerformed(ActionEvent e) {
+		
+		if(e.getSource() == btnHome) {
+			cardLayout.show(pnlMain, "Home");
+		}
+		else if(e.getSource() == btnAddNewItem) {
+			pnlMain.add("AddNewItem", new PanelAddNewItem());
+			cardLayout.show(pnlMain, "AddNewItem");
+		}
+		else if(e.getSource() == btnGoToShopping) {
+			pnlMain.add("GoToShopping", new PanelGoToShopping());
+			cardLayout.show(pnlMain, "GoToShopping");
+		}
+		else if(e.getSource() == btnMyShoppingCart) {		
+			pnlMain.add("MyShoppingCart", new PanelMyShoppingCart());
+			cardLayout.show(pnlMain, "MyShoppingCart");
+		}
+		else {
+			pnlMain.add("History", new PanelHistory());
+			cardLayout.show(pnlMain, "History");
+		}
 		
 	}
 
