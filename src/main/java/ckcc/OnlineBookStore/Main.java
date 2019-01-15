@@ -17,7 +17,7 @@ public class Main {
 		
 		System.out.println(format.format(date));
 
-		Thread.sleep(10000);
+		Thread.sleep(5000);
 		
 		System.out.println(format.format(date));
 		
