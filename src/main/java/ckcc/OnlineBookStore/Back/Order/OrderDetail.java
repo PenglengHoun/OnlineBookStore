@@ -39,6 +39,15 @@ public class OrderDetail {
 		
 	}
 	
+	public OrderDetail(int bookId, int qty, double price, double discount) {
+		this.bookId = bookId;
+		this.qty = qty;
+		this.price = price;
+		this.discount = discount;
+		subTotal = getTotal() - getDiscountMoney();
+		
+	}
+	
 	public void addOrderDetail(TempOrderDetail t) {
 		bookId = t.getBookId();
 		qty = t.getQty();
@@ -47,11 +56,13 @@ public class OrderDetail {
 		price = t.getPrice();
 	}
 	
-	private double getDiscountMoney() {
+	
+	
+	public double getDiscountMoney() {
 		return (qty * price) * getDiscount();
 	}
 	
-	private double getTotal() {
+	public double getTotal() {
 		return qty * price;
 	}
 	

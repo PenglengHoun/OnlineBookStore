@@ -9,20 +9,18 @@ import ckcc.OnlineBookStore.Back.Extra.TableTitle;
 
 public class Main {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 	
 		Date date = new Date();
 		
-		SimpleDateFormat format = new SimpleDateFormat("dd-MM-YYYY / HH:mm");
+		SimpleDateFormat format = new SimpleDateFormat("dd-MM-YYYY / HH:mm:ss");
 		
 		System.out.println(format.format(date));
-		String title = String.format("%45s%s%46s", " ", "Invoice", " ");
-		String l2 = "+----------+----------+------------------------------+----------+----------+----------+----------+";
-		String l3 = String.format("|%-10s|%-10s|%-30s|%-10s|%-10s|%-10s|%-10s|", 
-				TableTitle.ID, TableTitle.BOOK_ID, TableTitle.TITLE, TableTitle.PRICE, TableTitle.QTY,
-				TableTitle.DISCOUNT, TableTitle.SUB_TOTAL);
+
+		Thread.sleep(10000);
 		
-		System.out.println(title + "\n" + l2 + "\n" + l3);
+		System.out.println(format.format(date));
+		
 		
 	}
 

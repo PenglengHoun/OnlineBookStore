@@ -56,9 +56,6 @@ public class Cart {
 		this.date = date;
 		this.discount = discount;
 		this.remark = remark;
-
-		total = getSubTotal() - getDiscountMoney();
-		
 	}
 	
 	public Cart() {
@@ -93,15 +90,15 @@ public class Cart {
 		this.remark = remark;
 	}
 
-	public double getTotal() {
-		return total;
+	public double getSubTotal() {
+		return getTotal() - getDiscountMoney();
 	}
 	
 	public double getDiscountMoney() {
-		return getSubTotal() * discount / 100;
+		return getTotal() * discount / 100;
 	}
 	
-	public double getSubTotal() {
+	public double getTotal() {
 		double t = 0;
 		for(OrderDetail temp : orderDetail)
 			t += temp.getSubTotal();
@@ -109,9 +106,7 @@ public class Cart {
 	}
 	
 	public Object[] getInfo() {
-		
-		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy / HH:mm");
-		
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy / HH:mm");	
 		return new Object[] {
 			id, customer.getName(), sdf.format(date)	
 		};
